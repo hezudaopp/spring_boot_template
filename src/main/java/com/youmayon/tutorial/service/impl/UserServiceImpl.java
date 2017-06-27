@@ -4,6 +4,8 @@ import com.youmayon.tutorial.data.UserRepository;
 import com.youmayon.tutorial.domain.User;
 import com.youmayon.tutorial.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,8 +37,18 @@ public class UserServiceImpl implements UserService {
     public List<User> list() {
         return userRepository.findAll();
     }
+
     @Override
     public void delete(long id) {
         userRepository.delete(id);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = get(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("User " + username + " not found.");
+        }
+        return user;
     }
 }

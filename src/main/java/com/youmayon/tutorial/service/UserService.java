@@ -1,10 +1,11 @@
 package com.youmayon.tutorial.service;
 
 import com.youmayon.tutorial.domain.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
 
-public interface UserService {
+public interface UserService extends UserDetailsService {
 
     /**
      * 新增或者更新一个用户

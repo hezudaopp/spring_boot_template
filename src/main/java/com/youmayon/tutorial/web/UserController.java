@@ -1,14 +1,21 @@
 package com.youmayon.tutorial.web;
 
+import com.youmayon.tutorial.constant.SecurityConstants;
 import com.youmayon.tutorial.domain.User;
-
-import java.util.*;
-
 import com.youmayon.tutorial.service.UserService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 通过这里配置使下面的映射都在/users下，可去除
@@ -19,12 +26,15 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    private PasswordEncoder passwordEncoder = new StandardPasswordEncoder(SecurityConstants.PASSWORD_ENCODER_SECRET);
+
     /**
      * 处理"/users/"的GET请求，用来获取用户列表
      * 还可以通过@RequestParam从页面中传递参数来进行查询条件或者翻页信息的传递
      * @return
      */
     @ApiOperation(value = "获取用户列表", notes = "全部用户列表 ")
+//    @PreAuthorize("#oauth2.hasScope('read')")
     @RequestMapping(method = RequestMethod.GET)
     public List<User> getUserList() {
         return userService.list();
@@ -39,7 +49,11 @@ public class UserController {
     @ApiOperation(value = "创建用户", notes = "根据User对象创建用户")
     @ApiImplicitParam(name = "user", value = "用户详细实体user", required = true, dataType = "User")
     @RequestMapping(method = RequestMethod.POST)
-    public User postUser(@ModelAttribute User user) {
+    public User postUser(@Valid @ModelAttribute User user,
+                         Errors errors) {
+        // encode password.
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setCreatedTime(System.currentTimeMillis() / 1000);
         return userService.save(user);
     }
 
@@ -63,10 +77,13 @@ public class UserController {
      * @return
      */
     @ApiOperation(value = "更新用户详细信息", notes = "根据url的id来指定更新对象，并根据传过来的user信息来更新用户详细信息")
-    @RequestMapping(value = "/{id}", method=RequestMethod.PUT)
-    public User putUser(@PathVariable Long id, @ModelAttribute User unsavedUser) {
+    @RequestMapping(value = "/{id}", method=RequestMethod.PATCH)
+    public User patchUser(@PathVariable Long id, @ModelAttribute User unsavedUser) {
         User savedUser = userService.get(id);
-        savedUser.setUsername(unsavedUser.getUsername());
+        Assert.notNull(savedUser, "User " + id + " not found.");
+        unsavedUser.setCreatedTime(null);
+        unsavedUser.setPassword(null);
+        ReflectionUtils.shallowCopyFieldState(unsavedUser, savedUser);
         return userService.save(savedUser);
     }
 
