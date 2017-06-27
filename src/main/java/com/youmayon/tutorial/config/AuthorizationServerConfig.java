@@ -1,5 +1,6 @@
 package com.youmayon.tutorial.config;
 
+import com.youmayon.tutorial.constant.SecurityConstants;
 import com.youmayon.tutorial.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -38,8 +39,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory()
-                .withClient("client_id") // 配置默认的client
-                .secret("client_secret")
+                .withClient(SecurityConstants.CLIENT_ID) // 配置默认的client
+                .secret(SecurityConstants.CLIENT_SECRET)
                 .authorizedGrantTypes("password", "refresh_token")
                 .scopes("read").autoApprove("read");
     }

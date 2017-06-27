@@ -59,56 +59,65 @@ public class ApplicationTests {
                 .andExpect(content().string(equalTo("你好")));
     }
 
-    //  	测试UserController
+    // 测试UserController
     @Test
     public void testUserController() throws Exception {
-        RequestBuilder request = null;
+        RequestBuilder request;
 
-        // 1、get查一下user列表，应该为空
-        request = get("/users/");
-        mvc.perform(request)
-                .andExpect(status().isOk())
-                .andExpect(content().string(equalTo("[]")));
+        String username = "hezudaopp";
+        String password = "youmayon";
+        String newPassword = "youmayon1";
 
         // 2、post提交一个user
-        request = post("/users/")
-                .param("username", "测试大师");
+        String json = "{\"username\":\""+ username +"\", \"password\":\"" + password + "\"}";
+        request = post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
         MvcResult mvcResult = mvc.perform(request)
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("\"username\":\"测试大师\"")))
+                .andExpect(content().string(containsString("\"username\":\""+ username +"\"")))
                 .andReturn();
         JSONObject jasonObject = JSON.parseObject(mvcResult.getResponse().getContentAsString());
         String id = jasonObject.get("id").toString();
 
+//        String accessToken = getPasswordGrantTypeAccessToken(username, password);
+        String accessToken = "";
+
         // 3、get获取user列表，应该有刚才插入的数据
-        request = get("/users/");
+        request = get("/users" + "?access_token = " + accessToken);
         mvc.perform(request)
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("\"username\":\"测试大师\"")));
+                .andExpect(content().string(containsString("\"username\":\""+ username +"\"")));
 
         // 4、put修改id为{id}的user
-        request = put("/users/" + id)
-                .param("username", "测试终极大师");
+        json = "{\"username\":\"newUsername\", \"password\":\"" + newPassword + "\"}";
+        request = patch("/users/" + id + "?access_token = " + accessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
         mvc.perform(request)
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString("\"username\":\"测试终极大师\"")));
-
-        // 5、get一个id为{id}的user
-        request = get("/users/" + id);
-        mvc.perform(request)
-                .andExpect(content().string(equalTo("{\"id\":" + id + ",\"username\":\"测试终极大师\"}")));
+                .andDo(MockMvcResultHandlers.print());
 
         // 6、del删除id为{id}的user
-        request = delete("/users/" + id);
+        request = delete("/users/" + id + "?access_token = " + accessToken);
         mvc.perform(request)
                 .andExpect(status().isOk());
 
         // 7、get查一下user列表，应该为空
-        request = get("/users/");
+        request = get("/users" + "?access_token = " + accessToken);
         mvc.perform(request)
                 .andExpect(status().isOk())
                 .andExpect(content().string(equalTo("[]")));
 
     }
 
+    private String getPasswordGrantTypeAccessToken(String username, String password) throws Exception {
+        RequestBuilder request = post("/oauth/token?grant_type=password&username=" + username + "&password=" + password);
+        MvcResult mvcResult = mvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("\"access_token\":")))
+                .andReturn();
+        JSONObject jasonObject = JSON.parseObject(mvcResult.getResponse().getContentAsString());
+        return jasonObject.get("access_token").toString();
+    }
 }

@@ -64,9 +64,18 @@ public class StringUtils {
     }
 
     /**
+     * 头字母转大写
+     * @param param
+     * @return
+     */
+    public static final String uppperCaseFirstChar(String param) {
+        return Character.toUpperCase(param.charAt(0)) + param.substring(1);
+    }
+
+    /**
      * Whether elements of stringArray1 separated by STRING_ARRAY_SEPARATOR contains all elements of stringArray2.
-     * @param String stringArray1
-     * @param String stringArray2
+     * @param string1
+     * @param string2
      * @return
      */
     public static final boolean containsAll(String string1, String string2) {

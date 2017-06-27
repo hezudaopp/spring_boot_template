@@ -1,5 +1,6 @@
 package com.youmayon.tutorial.domain;
 
+import org.hibernate.annotations.Immutable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,10 +27,10 @@ public class User implements UserDetails {
     @NotNull
     @Size(max = 50)
     @Column(unique = true)
-    private String username;
+    private String username; // immutable field without setter.
 
     @NotNull
-    @Size(max = 80)
+    @Size(min = 6, max = 80)
     private String password;
 
     @Min(0)
@@ -55,10 +56,6 @@ public class User implements UserDetails {
 
     public String getUsername() {
         return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getPassword() {

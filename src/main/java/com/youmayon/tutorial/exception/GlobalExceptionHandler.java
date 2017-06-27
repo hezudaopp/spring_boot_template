@@ -1,6 +1,7 @@
 package com.youmayon.tutorial.exception;
 
 import com.youmayon.tutorial.dto.ErrorInfo;
+import org.springframework.security.oauth2.common.exceptions.InvalidRequestException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -21,13 +22,13 @@ public class GlobalExceptionHandler {
         return errorInfo;
     }
 
-    @ExceptionHandler(value = MyException.class)
+    @ExceptionHandler(value = InvalidRequestException.class)
     @ResponseBody
-    public ErrorInfo<String> jsonErrorHandler(HttpServletRequest req, MyException e) throws Exception {
+    public ErrorInfo<String> jsonErrorHandler(HttpServletRequest req, InvalidRequestException e) throws Exception {
         ErrorInfo<String> errorInfo = new ErrorInfo<>();
         errorInfo.setMessage(e.getMessage());
         errorInfo.setCode(ErrorInfo.getERROR());
-        errorInfo.setData("My exception");
+        errorInfo.setData("Invalid request.");
         errorInfo.setUrl(req.getRequestURL().toString());
         return errorInfo;
     }

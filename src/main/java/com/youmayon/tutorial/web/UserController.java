@@ -2,15 +2,15 @@ package com.youmayon.tutorial.web;
 
 import com.youmayon.tutorial.constant.SecurityConstants;
 import com.youmayon.tutorial.domain.User;
+import com.youmayon.tutorial.enums.Role;
 import com.youmayon.tutorial.service.UserService;
+import com.youmayon.tutorial.util.ReflectionUtils;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.util.Assert;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,11 +49,12 @@ public class UserController {
     @ApiOperation(value = "创建用户", notes = "根据User对象创建用户")
     @ApiImplicitParam(name = "user", value = "用户详细实体user", required = true, dataType = "User")
     @RequestMapping(method = RequestMethod.POST)
-    public User postUser(@Valid @ModelAttribute User user,
+    public User postUser(@Valid @RequestBody User user,
                          Errors errors) {
         // encode password.
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreatedTime(System.currentTimeMillis() / 1000);
+        user.setRole(Role.ROLE_USER.name());
         return userService.save(user);
     }
 
@@ -78,12 +79,14 @@ public class UserController {
      */
     @ApiOperation(value = "更新用户详细信息", notes = "根据url的id来指定更新对象，并根据传过来的user信息来更新用户详细信息")
     @RequestMapping(value = "/{id}", method=RequestMethod.PATCH)
-    public User patchUser(@PathVariable Long id, @ModelAttribute User unsavedUser) {
+    public User patchUser(@PathVariable Long id, @RequestBody User unsavedUser) {
         User savedUser = userService.get(id);
         Assert.notNull(savedUser, "User " + id + " not found.");
-        unsavedUser.setCreatedTime(null);
-        unsavedUser.setPassword(null);
-        ReflectionUtils.shallowCopyFieldState(unsavedUser, savedUser);
+        if (unsavedUser.getPassword() != null) {
+            unsavedUser.setPassword(passwordEncoder.encode(unsavedUser.getPassword()));
+        }
+        ReflectionUtils.mergeObject(unsavedUser, savedUser);
+        savedUser.setModifiedTime(System.currentTimeMillis() / 1000);
         return userService.save(savedUser);
     }
 
