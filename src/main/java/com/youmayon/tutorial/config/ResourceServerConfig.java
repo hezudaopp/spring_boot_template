@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHand
 @Configuration
 @EnableResourceServer
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
+
     /**
      * 配置资源访问权限
      * @param http

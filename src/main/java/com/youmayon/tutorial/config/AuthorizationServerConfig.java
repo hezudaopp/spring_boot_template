@@ -3,6 +3,8 @@ package com.youmayon.tutorial.config;
 import com.youmayon.tutorial.constant.SecurityConstants;
 import com.youmayon.tutorial.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,7 +15,9 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
+
+import javax.sql.DataSource;
 
 /**
  * Created by jawinton on 26/06/2017.
@@ -28,6 +32,54 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Autowired
     AuthenticationManager authenticationManager; // 引入security中提供的 AuthenticationManager
+
+    @Value("${spring.datasource.driver-class-name}")
+    private String oauthClass;
+
+    @Value("${spring.datasource.url}")
+    private String oauthUrl;
+
+    @Value("${spring.datasource.username}")
+    private String username;
+
+    @Value("${spring.datasource.password}")
+    private String password;
+
+    /**
+     * 使用数据库持久化token
+     * 需要先创建oauth_access_token表和oauth_refresh_token表
+     create table oauth_access_token (
+     token_id VARCHAR(256),
+     token BLOB,
+     authentication_id VARCHAR(256) PRIMARY KEY,
+     user_name VARCHAR(256),
+     client_id VARCHAR(256),
+     authentication BLOB,
+     refresh_token VARCHAR(256)
+     );
+
+     create table oauth_refresh_token (
+     token_id VARCHAR(256),
+     token BLOB,
+     authentication BLOB
+     );
+     * @return
+     */
+    @Bean
+    public TokenStore tokenStore() {
+        DataSource tokenDataSource = DataSourceBuilder.create()
+                .driverClassName(oauthClass)
+                .username(username)
+                .password(password)
+                .url(oauthUrl)
+                .build();
+        return new JdbcTokenStore(tokenDataSource);
+    }
+
+    //    @Bean
+//    public TokenStore tokenStore() {
+//        return new InMemoryTokenStore(); //使用内存中的 token store
+//    }
 
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
@@ -51,10 +103,5 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 .tokenStore(tokenStore())
                 .authenticationManager(authenticationManager)
                 .userDetailsService(userService);
-    }
-
-    @Bean
-    public TokenStore tokenStore() {
-        return new InMemoryTokenStore(); //使用内存中的 token store
     }
 }
