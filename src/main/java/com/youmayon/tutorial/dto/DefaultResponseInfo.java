@@ -1,14 +1,20 @@
 package com.youmayon.tutorial.dto;
 
-public class ErrorInfo<T> {
+public class DefaultResponseInfo<T> {
 
     private static final Integer OK = 0;
-    private static final Integer ERROR = 100;
 
     private Integer code;
     private String message;
     private String url;
     private T data;
+
+    public DefaultResponseInfo(Integer code, String message, String url, T data) {
+        this.code = code;
+        this.message = message;
+        this.url = url;
+        this.data = data;
+    }
 
     public String getUrl() {
         return url;
@@ -20,10 +26,6 @@ public class ErrorInfo<T> {
 
     public static Integer getOK() {
         return OK;
-    }
-
-    public static Integer getERROR() {
-        return ERROR;
     }
 
     public Integer getCode() {

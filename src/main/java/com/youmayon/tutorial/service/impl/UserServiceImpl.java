@@ -2,6 +2,7 @@ package com.youmayon.tutorial.service.impl;
 
 import com.youmayon.tutorial.data.UserRepository;
 import com.youmayon.tutorial.domain.User;
+import com.youmayon.tutorial.exception.UserNotFoundException;
 import com.youmayon.tutorial.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,12 +26,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User get(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException(username)
+        );
     }
 
     @Override
     public User get(long id) {
-        return userRepository.findOne(id);
+        User user = userRepository.findOne(id);
+        if (user == null) {
+            throw new UserNotFoundException(id);
+        }
+        return user;
     }
 
     @Override
@@ -44,11 +51,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = get(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User " + username + " not found.");
-        }
-        return user;
+    public UserDetails loadUserByUsername(String username) {
+        return get(username);
     }
 }
