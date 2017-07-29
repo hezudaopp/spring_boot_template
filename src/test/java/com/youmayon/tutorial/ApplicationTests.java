@@ -2,7 +2,6 @@ package com.youmayon.tutorial;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.youmayon.tutorial.web.BlogController;
 import com.youmayon.tutorial.web.HelloController;
 import com.youmayon.tutorial.web.UserController;
 import org.junit.Before;
@@ -32,17 +31,13 @@ public class ApplicationTests {
     private MockMvc mvc;
 
     @Autowired
-    private BlogController blogController;
-
-    @Autowired
     private UserController userController;
 
     @Before
     public void setUp() throws Exception {
         mvc = MockMvcBuilders.standaloneSetup(
                 new HelloController(),
-                userController,
-                blogController).build();
+                userController).build();
     }
 
     @Test
