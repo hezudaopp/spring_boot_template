@@ -17,7 +17,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
     /**
      * 配置资源访问权限
-     * @param http
+     * @param http HttpSecurity
      * @throws Exception
      */
     @Override
@@ -25,6 +25,10 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/hello").permitAll() // hello接口不需要认证即可访问
                 .antMatchers(HttpMethod.POST, "/users").permitAll() // 注册用户不需要认证
+                .antMatchers(HttpMethod.GET, "/swagger-resources").permitAll()
+                .antMatchers(HttpMethod.GET, "/v2/api-docs").permitAll()
+                .antMatchers(HttpMethod.GET, "/configuration/security").permitAll()
+                .antMatchers(HttpMethod.GET, "/configuration/ui").permitAll()
                 .anyRequest().authenticated();
 //        .anyRequest().permitAll();
         http.exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler());
