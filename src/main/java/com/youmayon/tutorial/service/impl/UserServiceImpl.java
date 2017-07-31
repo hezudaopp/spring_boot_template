@@ -41,8 +41,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> list() {
-        return userRepository.findAll();
+    public List<User> list(boolean enabled) {
+        return userRepository.findByEnabled(enabled);
     }
 
     @Override

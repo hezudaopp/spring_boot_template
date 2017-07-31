@@ -36,8 +36,8 @@ public class UserController {
     @ApiOperation(value = "获取用户列表", notes = "全部用户列表 ")
 //    @PreAuthorize("#oauth2.hasScope('read')")
     @RequestMapping(method = RequestMethod.GET)
-    public List<User> getUserList() {
-        return userService.list();
+    public List<User> getUserList(@RequestParam(value = "enabled") boolean enabled) {
+        return userService.list(enabled);
     }
 
     /**
