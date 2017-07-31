@@ -20,7 +20,7 @@ import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import javax.sql.DataSource;
 
 /**
- * Created by jawinton on 26/06/2017.
+ * Created by Jawinton on 26/06/2017.
  * Oauth2 配置
  */
 @Configuration
@@ -28,10 +28,10 @@ import javax.sql.DataSource;
 @EnableResourceServer //必须
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
     @Autowired
-    UserService userService; // 引入security中提供的 UserDetailsService
+    private UserService userService; // 引入security中提供的 UserDetailsService
 
     @Autowired
-    AuthenticationManager authenticationManager; // 引入security中提供的 AuthenticationManager
+    private AuthenticationManager authenticationManager; // 引入security中提供的 AuthenticationManager
 
     @Value("${spring.datasource.driver-class-name}")
     private String oauthClass;
@@ -63,7 +63,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      token BLOB,
      authentication BLOB
      );
-     * @return
      */
     @Bean
     public TokenStore tokenStore() {

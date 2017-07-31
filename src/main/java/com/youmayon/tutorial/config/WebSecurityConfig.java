@@ -13,13 +13,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 
 /**
- * Created by jawinton on 26/06/2017.
+ * Created by Jawinton on 26/06/2017.
  * Spring security 配置
  */
 @Configuration
 public class WebSecurityConfig  extends WebSecurityConfigurerAdapter {
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
