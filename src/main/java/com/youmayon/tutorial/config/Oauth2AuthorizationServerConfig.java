@@ -1,19 +1,19 @@
 package com.youmayon.tutorial.config;
 
-import com.youmayon.tutorial.constant.SecurityConstants;
 import com.youmayon.tutorial.domain.User;
 import com.youmayon.tutorial.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -22,6 +22,7 @@ import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,7 +34,6 @@ import java.util.Map;
  */
 @Configuration
 @EnableAuthorizationServer // 必须
-@EnableResourceServer //必须
 public class Oauth2AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
     @Value("${security.oauth2.resource.id:spring-boot-template}") // 默认值spring-boot-application
     private String resourceId;
@@ -63,10 +63,11 @@ public class Oauth2AuthorizationServerConfig extends AuthorizationServerConfigur
     }
 
     /**
-     * token存储,这里使用jwt方式存储
+     * jwt token store
      * @return TokenStore
      */
     @Bean
+    @Primary
     public TokenStore jwtTokenStore() {
         return new JwtTokenStore(accessTokenConverter());
     }
@@ -77,26 +78,12 @@ public class Oauth2AuthorizationServerConfig extends AuthorizationServerConfigur
      */
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
-//        JwtAccessTokenConverter converter = new JwtAccessTokenConverter(){
-//            /***
-//             * 重写增强token方法,用于自定义一些token返回的信息
-//             */
-//            @Override
-//            public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
-//                String userName = authentication.getUserAuthentication().getName();
-//                User user = (User) authentication.getUserAuthentication().getPrincipal();// 与登录时候放进去的UserDetail实现类一直查看link{SecurityConfiguration}
-//                /** 自定义一些token属性 ***/
-//                final Map<String, Object> additionalInformation = new HashMap<>();
-//                additionalInformation.put("id", user.getId());
-//                additionalInformation.put("userName", userName);
-//                additionalInformation.put("roles", user.getAuthorities());
-//                ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInformation);
-//                OAuth2AccessToken enhancedToken = super.enhance(accessToken, authentication);
-//                return enhancedToken;
-//            }
-//        };
         JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        converter.setSigningKey(SecurityConstants.JWT_SIGNING_KEY);
+        // RSA算法，设置私钥
+        KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(new ClassPathResource("spring-boot-template.jks"), "jawinton".toCharArray());
+        converter.setKeyPair(keyStoreKeyFactory.getKeyPair("spring_boot_template"));
+        // 对称加密
+//        converter.setSigningKey(SecurityConstants.JWT_SIGNING_KEY);
         return converter;
     }
 
