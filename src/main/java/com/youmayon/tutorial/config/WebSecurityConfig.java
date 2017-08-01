@@ -24,12 +24,11 @@ public class WebSecurityConfig  extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable() // oauth server 不需要 csrf 防护
                 .authorizeRequests()
-//                .anyRequest().authenticated() //其他页面都需要登录后访问
-                .anyRequest().permitAll()
-                .and()
-                .httpBasic().disable(); // 禁止 basic 认证
+                .antMatchers(HttpMethod.OPTIONS).permitAll()
+                .anyRequest().authenticated()
+                .and().httpBasic()
+                .and().csrf().disable();
     }
 
 

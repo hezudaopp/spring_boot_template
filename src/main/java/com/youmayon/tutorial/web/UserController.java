@@ -31,20 +31,20 @@ public class UserController {
     /**
      * 处理"/users/"的GET请求，用来获取用户列表
      * 还可以通过@RequestParam从页面中传递参数来进行查询条件或者翻页信息的传递
-     * @return
+     * @return User List
      */
     @ApiOperation(value = "获取用户列表", notes = "全部用户列表 ")
 //    @PreAuthorize("#oauth2.hasScope('read')")
     @RequestMapping(method = RequestMethod.GET)
-    public List<User> getUserList(@RequestParam(value = "enabled") boolean enabled) {
+    public List<User> getUserList(@RequestParam(value = "enabled", defaultValue = "1") boolean enabled) {
         return userService.list(enabled);
     }
 
     /**
      * 处理"/users/"的POST请求，用来创建User
      * 除了@ModelAttribute绑定参数之外，还可以通过@RequestParam从页面中传递参数
-     * @param user
-     * @return
+     * @param user 用户entity
+     * @return User
      */
     @ApiOperation(value = "创建用户", notes = "根据User对象创建用户")
     @ApiImplicitParam(name = "user", value = "用户详细实体user", required = true, dataType = "User")
@@ -61,8 +61,8 @@ public class UserController {
     /**
      * 处理"/users/{id}"的GET请求，用来获取url中id值的User信息
      * url中的id可通过@PathVariable绑定到函数的参数中
-     * @param id
-     * @return
+     * @param id 用户id
+     * @return User
      */
     @ApiOperation(value = "获取用户详细信息", notes = "根据url的id来获取用户详细信息")
     @ApiImplicitParam(name = "id", value = "用户ID", required = true, dataType = "Long")
@@ -73,9 +73,9 @@ public class UserController {
 
     /**
      * 处理"/users/{id}"的PUT请求，用来更新User信息
-     * @param id
+     * @param id 用户id
      * @param unsavedUser
-     * @return
+     * @return User
      */
     @ApiOperation(value = "更新用户详细信息", notes = "根据url的id来指定更新对象，并根据传过来的user信息来更新用户详细信息")
     @RequestMapping(value = "/{id}", method=RequestMethod.PATCH)
@@ -92,7 +92,7 @@ public class UserController {
 
     /**
      * 处理"/users/{id}"的DELETE请求，用来删除User
-     * @param id
+     * @param id 用户id
      */
     @ApiOperation(value = "删除用户", notes = "根据url的id来指定删除对象")
     @ApiImplicitParam(name = "id", value = "用户ID", required = true, dataType = "Long")
