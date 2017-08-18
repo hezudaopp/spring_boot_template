@@ -30,7 +30,7 @@ public interface UserService extends UserDetailsService {
      * 获取全部用户列表
      * @return
      */
-    List<User> list();
+    List<User> list(boolean enabled);
 
     /**
      * 根据id删除一个用户

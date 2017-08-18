@@ -1,6 +1,5 @@
 package com.youmayon.tutorial.domain;
 
-import org.hibernate.annotations.Immutable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -43,6 +42,9 @@ public class User implements UserDetails {
     @Size(min = 5, max = 50)
     @Column(nullable = false)
     private String role;
+
+    @Column(nullable = false)
+    private Boolean enabled;
 
     public User() {}
 
@@ -114,6 +116,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 }
