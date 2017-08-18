@@ -22,7 +22,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/hello").permitAll() // hello接口不需要认证即可访问
+                .antMatchers("/uuid").permitAll() // hello接口不需要认证即可访问
                 .antMatchers(HttpMethod.POST, "/users").permitAll() // 注册用户不需要认证
                 .anyRequest().authenticated();
 //        .anyRequest().permitAll();

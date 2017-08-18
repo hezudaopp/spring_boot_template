@@ -1,5 +1,6 @@
 package com.youmayon.tutorial.web;
 
+import com.youmayon.tutorial.util.UuidUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,9 +11,9 @@ public class HelloController {
     private Integer serverPort;
 
 
-    @RequestMapping("/hello")
-    public String index() {
-        return "你好";
+    @RequestMapping("/uuid")
+    public long uuid() {
+        return UuidUtils.generateUuid(1L);
     }
 
     @RequestMapping("/server_port")
